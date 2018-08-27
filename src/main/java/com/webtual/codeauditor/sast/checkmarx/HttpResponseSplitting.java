@@ -1,6 +1,6 @@
 /**
- * <p>Project: rytry </p>
- * <p>Package Name: com.webtual.rytry.barclays.checkMarx.solutions </p>
+ * <p>Project: codeauditor </p>
+ * <p>Package Name: com.webtual.codeauditor.sast.checkmarx </p>
  * <p>File Name: HttpResponseSplitting.java </p>
  * <p>Create Date: Aug 27, 2018 </p>
  * <p>Create Time: 12:49:02 PM </p>
@@ -13,7 +13,7 @@
  * @version 1.0
  */
 
-package com.webtual.rytry.barclays.checkMarx.solutions;
+package com.webtual.codeauditor.sast.checkmarx;
 
 import java.net.URLEncoder;
 
