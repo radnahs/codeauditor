@@ -7,18 +7,18 @@
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2018</p>
  * <p>Company:  </p>
-
  * @author Shantanu Sikdar
-
- * @version 1.0
+ * @version 1.0		
  */
 
 package com.webtual.codeauditor.sast.checkmarx;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 
 /**
  * 
@@ -68,33 +68,66 @@ import org.apache.http.HttpResponse;
  * @author Shantanu Sikdar
  *
  */
-
+	
 public class HttpResponseSplitting {
 
 	public static void main(String[] args) {
-
+		CompliantHTTPResponseSplitting compliantHTTPResponseSplitting = new CompliantHTTPResponseSplitting();
+		String employee = "Anthony\nGonzalves<script></script>";
+		String encode = compliantHTTPResponseSplitting.removeNewLineAndEncodeResponse(employee);
+		System.out.println(employee+" after encode == "+encode);
+		String decode = compliantHTTPResponseSplitting.decodeResponse(employee);
+		System.out.println(encode +" after decode == "+decode);
 	}
 }
 
 class NonCompliantHTTPResponseSplitting {
 
-	public void foo(HttpRequest request, HttpResponse response) {
-		String author = request.getParams().getParameter("author").toString();
-		response.addHeader("Author", author);
+	public void vulnerableCodeInMethod(HttpServletRequest req, HttpServletResponse res){
+		String employee = req.getParameter("employee");
+		res.addHeader("employee", employee);
 	}
 
 }
 
 class CompliantHTTPResponseSplitting {
-
-	public void foo(HttpRequest request, HttpResponse response) {
-		String author = request.getParams().getParameter("author").toString();
-		if (!author.contains("\n")) {
-			author = URLEncoder.encode(author);
-			response.addHeader("Author", author);
-		}
-
+	
+	public void resilientCodeInMethod(HttpServletRequest request, HttpServletResponse response) {
+		String employee = request.getParameter("employee");
+		String sanitizeEmployee = removeNewLineAndEncodeResponse(employee);
+		response.addHeader("employee", sanitizeEmployee);
 	}
+
+
+	/**
+	 * Removing the newline and URL-encode all special (non-alphanumeric) user input 
+	 * before including it in the response header.
+	 * @param employee
+	 * @return
+	 */
+	public String removeNewLineAndEncodeResponse(String employee){
+		String sanitizeVal=null;
+		if (!employee.contains("\n")) {
+			try{
+				sanitizeVal = URLEncoder.encode(employee,"UTF-8");
+				System.out.println("sanitizeVal ===  "+sanitizeVal);
+			}catch(UnsupportedEncodingException uee){
+				uee.printStackTrace();
+			}
+		}
+		return sanitizeVal;
+	}
+	
+
+	public String decodeResponse(String employee){
+		String sanitizeVal=null;
+		try {
+			sanitizeVal = URLDecoder.decode(employee,"UTF-8");
+		} catch (UnsupportedEncodingException uee) {
+			uee.printStackTrace();
+		}
+		return sanitizeVal;
+	}	
 
 }
 
